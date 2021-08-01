@@ -1,12 +1,15 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'dart:io';
+
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:validators/validators.dart';
+import 'package:currency_picker/currency_picker.dart';
 
 class CreateCouponPage extends StatefulWidget {
   @override
@@ -26,17 +29,21 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
   int _expiringDateInEpoch;
   bool _isTextCoupon = false;
   bool _unlimtedRedemption = true;
-
   bool _singleUserRedemption = false;
-  DiscountType _discountType;
-  int _offer;
+  String _currencyCode;
+  DiscountType _discountType = DiscountType.percentageOff;
+
+  double _amountOff;
+  double _percentageOff;
+
   int _redemptionLimit;
-  String _itemUrl;
+  String _webUrl;
   String _textCouponCode;
   bool _show = true;
-  List<String> _tagsList = [];
-  List<String> _tagsSelected = [];
-  List<Widget> _tagsSelectedWidget = [];
+  List<String> _catsList = [];
+  List<String> _catsSelected = [];
+  List<Widget> _catsSelectedWidget = [];
+  List<String> _allCategories = [];
   final _buttonColor = primaryColor;
 
   @override
@@ -45,9 +52,14 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
     _focusNode = FocusNode();
     _catController = TextEditingController();
     _dateController = TextEditingController(text: _expiringDate);
+    _currencyCode = Storage.instance.getDefaultCurrency();
     _couponDescController = TextEditingController();
-
+    initData();
     super.initState();
+  }
+
+  initData() async {
+    _catsList = await Storage.instance.getCouponsCategories();
   }
 
   @override
@@ -64,7 +76,7 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
   }
 
   Widget _buildTag(String value) {
-    _tagsSelected.add(value);
+    _catsSelected.add(value);
     Widget wid;
     wid = Container(
       margin: EdgeInsets.only(right: 10, bottom: 5),
@@ -79,13 +91,13 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
           ),
           onPressed: () {
             setState(() {
-              _tagsSelectedWidget.remove(wid);
+              _catsSelectedWidget.remove(wid);
             });
-            _tagsList.remove(value);
+            _catsSelected.remove(value);
           }),
     );
     setState(() {
-      _tagsSelectedWidget.add(wid);
+      _catsSelectedWidget.add(wid);
     });
     return wid;
   }
@@ -93,17 +105,18 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
   _submitForm() {
     var future = Storage.instance.createStoreCoupon(
       discountType: _discountType,
-      offer: _offer,
+      amountOff: _amountOff,
+      percentageOff: _percentageOff,
       desc: _desc,
       expiringDate: _expiringDateInEpoch,
-      categories: _tagsSelected,
-      currency: "ngn",
+      categories: _catsSelected,
+      currencyCode: _currencyCode,
       //singleUserUse: _singleUserRedemption,
       unlimitedRedemption: _unlimtedRedemption,
       redemptionLimit: _redemptionLimit,
       isTextCoupon: _isTextCoupon,
       textCouponCode: _textCouponCode,
-      itemUrl: _itemUrl,
+      webUrl: _webUrl,
     );
 
     showDialog(
@@ -248,48 +261,76 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                             border: OutlineInputBorder(),
                           ),
                           hint: Text("type of discount the coupon represent"),
-                          value: DiscountType.percentage,
+                          value: DiscountType.percentageOff,
                           onChanged: (value) {
-                            _discountType = value;
+                            setState(() {
+                              _discountType = value;
+                            });
                           },
                           items: [
                             DropdownMenuItem(
                               child: Text("Percentage off"),
-                              value: DiscountType.percentage,
+                              value: DiscountType.percentageOff,
                             ),
                             DropdownMenuItem(
-                              child: Text("Voucher"),
-                              value: DiscountType.voucher,
+                              child: Text("Amount off"),
+                              value: DiscountType.amount_off,
                             ),
                           ],
                         ),
                         SizedBox(
                           height: 20,
                         ),
-                        TextFormField(
-                          onFieldSubmitted: (offer) {
-                            _offer = int.parse(offer);
-                          },
-                          maxLines: 1,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            hintText: "Enter Discount offer",
-                            labelText: "Offer",
-                          ),
-                          validator: (String value) {
-                            if (!isLength(value, 1)) {
-                              return 'Enter a value';
-                            }
+                        if (_discountType == DiscountType.percentageOff)
+                          TextFormField(
+                            onFieldSubmitted: (percentageOff) {
+                              _percentageOff = double.parse(percentageOff);
+                            },
+                            maxLines: 1,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: "Enter percentage off",
+                              labelText: "Percentage off",
+                            ),
+                            validator: (String value) {
+                              if (!isLength(value, 1)) {
+                                return 'Enter a value';
+                              }
 
-                            var c = int.parse(value);
-                            if (c <= 0) {
-                              return "offer must be greather than 0";
-                            }
-                            return null;
-                          },
-                        ),
+                              var c = int.parse(value);
+                              if (c <= 0) {
+                                return "percentage off must be greather than 0";
+                              }
+                              return null;
+                            },
+                          ),
+                        if (_discountType == DiscountType.amount_off)
+                          TextFormField(
+                            onFieldSubmitted: (amountOff) {
+                              _amountOff = double.parse(amountOff);
+                            },
+                            maxLines: 1,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: "Enter amount off",
+                              labelText: "Amount off",
+                            ),
+                            validator: (String value) {
+                              if (!isLength(value, 1)) {
+                                return 'Enter a value';
+                              }
+
+                              var c = int.parse(value);
+                              if (c <= 0) {
+                                return "amount off must be greather than 0";
+                              }
+                              return null;
+                            },
+                          ),
                         SizedBox(
                           height: 20,
                         ),
@@ -377,7 +418,7 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                           hideOnEmpty: true,
                           hideOnError: true,
                           validator: (value) {
-                            if (_tagsSelected.length < 1) {
+                            if (_catsSelected.length < 1) {
                               return "select at least 1 category";
                             }
                             return null;
@@ -388,7 +429,6 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                             controller: _catController,
                             focusNode: _focusNode,
                             onSubmitted: (value) {
-                              print(value);
                               setState(() {
                                 _catController.clear();
                               });
@@ -407,7 +447,7 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                             _buildTag(value);
                           },
                           suggestionsCallback: (value) {
-                            var c = _tagsList.where((element) => element
+                            var c = _catsList.where((element) => element
                                 .toLowerCase()
                                 .contains("value".toLowerCase()));
 
@@ -424,11 +464,48 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                           height: 10,
                         ),
                         Wrap(
-                          children: _tagsSelectedWidget,
+                          children: _catsSelectedWidget,
                         ),
                         SizedBox(
                           height: 30,
                         ),
+
+                        if (_discountType == DiscountType.amount_off)
+                          ListTile(
+                            contentPadding: EdgeInsets.only(right: 15),
+                            title: Text(
+                              "Currency",
+                              style: body1,
+                            ),
+                            subtitle: Text("Select coupon currency"),
+                            trailing: GestureDetector(
+                              onTap: () {
+                                showCurrencyPicker(
+                                  context: context,
+                                  showFlag: true,
+                                  showCurrencyName: true,
+                                  showCurrencyCode: true,
+                                  onSelect: (Currency currency) {
+                                    var c = currency.code;
+                                    _currencyCode = c;
+                                  },
+                                );
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(
+                                    top: 20, bottom: 20, left: 10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(1000),
+                                  //  color: Colors.red,
+                                ),
+                                child: Text(
+                                  _currencyCode,
+                                  style: body1,
+                                ),
+                              ),
+                            ),
+                          ),
+
                         SwitchListTile.adaptive(
                           activeColor: _buttonColor,
                           dense: false,
@@ -436,7 +513,7 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                           isThreeLine: true,
                           title: Text("Text coupon"),
                           subtitle: Text(
-                              "To display coupon for your store. Enter the coupon code and the url to link back to the store"),
+                              "generate text coupon that can be validated through your backend"),
                           value: _isTextCoupon,
                           onChanged: (value) {
                             setState(() {
@@ -448,7 +525,7 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                           },
                         ),
                         if (_isTextCoupon)
-                          Container(
+                          /*    Container(
                             padding: EdgeInsets.only(top: 20),
                             child: TextFormField(
                               onFieldSubmitted: (value) {
@@ -467,31 +544,32 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                                 return null;
                               },
                             ),
-                          ),
-                        if (_isTextCoupon)
-                          Container(
-                            padding: EdgeInsets.only(top: 20),
-                            child: TextFormField(
-                              onFieldSubmitted: (value) {
-                                _itemUrl = value;
-                              },
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                labelText: "Url",
-                                hintText: "Enter Url",
-                                border: OutlineInputBorder(),
+                          ), */
+                          if (_isTextCoupon)
+                            Container(
+                              padding: EdgeInsets.only(top: 20),
+                              child: TextFormField(
+                                onFieldSubmitted: (value) {
+                                  _webUrl = value;
+                                },
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: "Enter website url",
+                                  hintText:
+                                      "Enter website url coupon can be used",
+                                  border: OutlineInputBorder(),
+                                ),
+                                minLines: 1,
+                                maxLines: 4,
+                                maxLength: 200,
+                                validator: (String value) {
+                                  if (!isURL(value)) {
+                                    return "not a valid url";
+                                  }
+                                  return null;
+                                },
                               ),
-                              minLines: 1,
-                              maxLines: 4,
-                              maxLength: 200,
-                              validator: (String value) {
-                                if (!isURL(value)) {
-                                  return "not a valid url";
-                                }
-                                return null;
-                              },
                             ),
-                          ),
                         //future_v2
                         /*   if (!_isTextCoupon)
                           SwitchListTile.adaptive(
@@ -509,23 +587,23 @@ class _CreateCouponPageState extends State<CreateCouponPage> {
                               });
                             },
                           ), */
-                        if (!_isTextCoupon)
-                          SwitchListTile.adaptive(
-                            dense: false,
-                            activeColor: _buttonColor,
-                            contentPadding: EdgeInsets.only(bottom: 20),
-                            isThreeLine: true,
-                            title: Text("Unlimited redemption"),
-                            subtitle: Text(
-                                "The coupon has no limit on the number of times it can be use by an unlimited number of people"),
-                            value: _unlimtedRedemption,
-                            onChanged: (value) {
-                              setState(() {
-                                _unlimtedRedemption = value;
-                                _show = value;
-                              });
-                            },
-                          ),
+
+                        SwitchListTile.adaptive(
+                          dense: false,
+                          activeColor: _buttonColor,
+                          contentPadding: EdgeInsets.only(bottom: 20),
+                          isThreeLine: true,
+                          title: Text("Unlimited redemption"),
+                          subtitle: Text(
+                              "The coupon has no limit on the number of times it can be use by an unlimited number of people"),
+                          value: _unlimtedRedemption,
+                          onChanged: (value) {
+                            setState(() {
+                              _unlimtedRedemption = value;
+                              _show = value;
+                            });
+                          },
+                        ),
                         if (!_show)
                           TextFormField(
                             keyboardType: TextInputType.number,

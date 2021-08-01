@@ -1,7 +1,7 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:cuo_cutter_app/screens/getting_started/login.dart';
-import 'package:cuo_cutter_app/theme.dart';
-import 'package:cuo_cutter_app/components/skip.dart';
+import 'package:cuo_cutter/screens/getting_started/login.dart';
+import 'package:cuo_cutter/theme.dart';
+import 'package:cuo_cutter/components/skip.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

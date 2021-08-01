@@ -1,5 +1,5 @@
-import 'package:cuo_cutter_app/screens/qr_scanner/qr_scanner.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/qr_scanner/qr_scanner.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 

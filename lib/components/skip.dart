@@ -1,7 +1,7 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:cuo_cutter_app/screens/home.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/home.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 
 // returns a skip button

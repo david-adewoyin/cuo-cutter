@@ -1,13 +1,13 @@
-import 'package:cuo_cutter_app/components/single_saved_coupon.dart';
-import 'package:cuo_cutter_app/components/store_coupon_action.dart';
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/models/store.dart';
-import 'package:cuo_cutter_app/screens/dashboard/store_management.dart';
-import 'package:cuo_cutter_app/screens/getting_started/login.dart';
-import 'package:cuo_cutter_app/screens/store_details.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
-import 'package:cuo_cutter_app/components/single_userstore_coupon.dart';
+import 'package:cuo_cutter/components/single_saved_coupon.dart';
+import 'package:cuo_cutter/components/store_coupon_action.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/models/store.dart';
+import 'package:cuo_cutter/screens/dashboard/store_management.dart';
+import 'package:cuo_cutter/screens/getting_started/login.dart';
+import 'package:cuo_cutter/screens/store_details.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
+import 'package:cuo_cutter/components/single_userstore_coupon.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -649,6 +649,7 @@ class _CouponDashboardState extends State<_CouponDashboard> {
 
   Widget buildCouponTile(Coupon coupon) {
     return Container(
+      key: UniqueKey(),
       margin: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       padding: EdgeInsets.only(bottom: 10, left: 5, top: 10),
       decoration: BoxDecoration(
@@ -865,54 +866,111 @@ class _CouponDashboardState extends State<_CouponDashboard> {
           ),
         ),
 
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Container(
-              child: FutureBuilder<List<Coupon>>(
-                  future: _couponsFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor:
-                              Theme.of(context).accentColor.withOpacity(0.7),
-                          strokeWidth: 4,
-                        ),
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return Center(child: Text("Unable to load coupons"));
-                    }
-                    if (snapshot.connectionState == ConnectionState.none) {
-                      print("no data found");
-                    }
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      print("Here nwo");
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: Text("No coupons found"),
-                        );
-                      }
-                      print("Here now again");
-                      var coupons = snapshot.data;
+        SliverFillRemaining(
+          child: FutureBuilder<List<Coupon>>(
+              future: _couponsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor:
+                          Theme.of(context).accentColor.withOpacity(0.7),
+                      strokeWidth: 4,
+                    ),
+                  );
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Unable to load coupons"));
+                }
+                if (snapshot.connectionState == ConnectionState.none) {
+                  print("no data found");
+                }
+                if (snapshot.connectionState == ConnectionState.done) {
+                  print("Here nwo");
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: Text("No coupons found"),
+                    );
+                  }
+                  print("Here now again");
+                  var coupons = snapshot.data;
 
-                      print(snapshot.data);
-                      _coupons = coupons;
-                      for (var coupon in coupons) {
-                        _couponsWidgets.add(buildCouponTile(coupon));
-                      }
+                  print(snapshot.data);
+                  _coupons = coupons;
+                  for (var coupon in coupons) {
+                    _couponsWidgets.add(buildCouponTile(coupon));
+                  }
 
-                      return Column(
-                        children: _couponsWidgets,
-                      );
-                    }
+                  //   return Container();
+                  return ListView(
+                    //   shrinkWrap: true,
+                    children: _couponsWidgets,
+                  );
+                  return Column(
+                    children: _couponsWidgets,
+                  );
+                }
 
-                    return Container();
-                  }),
-            )
-          ]),
+                return Container();
+              }),
         ),
 
+        /*     SliverList(
+          delegate: SliverChildListDelegate(
+            [
+              Container(
+                child: FutureBuilder<List<Coupon>>(
+                    future: _couponsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor:
+                                Theme.of(context).accentColor.withOpacity(0.7),
+                            strokeWidth: 4,
+                          ),
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return Center(child: Text("Unable to load coupons"));
+                      }
+                      if (snapshot.connectionState == ConnectionState.none) {
+                        print("no data found");
+                      }
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        print("Here nwo");
+                        if (!snapshot.hasData) {
+                          return Center(
+                            child: Text("No coupons found"),
+                          );
+                        }
+                        print("Here now again");
+                        var coupons = snapshot.data;
+
+                        print(snapshot.data);
+                        _coupons = coupons;
+                        for (var coupon in coupons) {
+                          _couponsWidgets.add(buildCouponTile(coupon));
+                        }
+
+                        return Container();
+                        //   return Container();
+                        return ListView(
+                          children: _couponsWidgets,
+                        );
+                        return Column(
+                          children: _couponsWidgets,
+                        );
+                      }
+
+                      return Container();
+                    }),
+              ),
+              ..._couponsWidgets
+            ],
+          ),
+        ),
+ */
         //  ..._coupons,
       ],
     );

@@ -9,8 +9,8 @@ import 'dart:io';
 import 'dart:ui' show lerpDouble;
 
 import 'package:camera/camera.dart';
-import 'package:cuo_cutter_app/screens/qr_scanner/util.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/qr_scanner/util.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

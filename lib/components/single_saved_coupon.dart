@@ -1,9 +1,9 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/screens/coupon_details.dart';
-import 'package:cuo_cutter_app/screens/store_details.dart';
-import 'package:cuo_cutter_app/theme.dart';
-import 'package:cuo_cutter_app/components/saved_coupon_action.dart';
-import 'package:cuo_cutter_app/components/routes.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/screens/coupon_details.dart';
+import 'package:cuo_cutter/screens/store_details.dart';
+import 'package:cuo_cutter/theme.dart';
+import 'package:cuo_cutter/components/saved_coupon_action.dart';
+import 'package:cuo_cutter/components/routes.dart';
 import 'package:flutter/material.dart';
 
 class SingleSavedCoupon extends StatelessWidget {

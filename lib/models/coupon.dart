@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:cuo_cutter_app/models/store.dart';
+import 'package:cuo_cutter/models/store.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -9,10 +9,10 @@ part 'coupon.g.dart';
 // DiscountType specify which type of discount is applied on a coupon
 
 enum DiscountType {
-  @JsonKey(name: "voucher")
-  voucher,
-  @JsonKey(name: "percentage")
-  percentage,
+  @JsonKey(name: "amount_off")
+  amount_off,
+  @JsonKey(name: "percentage_off")
+  percentageOff,
 }
 
 enum CouponState {
@@ -41,14 +41,16 @@ class Coupon {
   final String couponId;
   @JsonKey(required: true)
   final Store store;
-  @JsonKey(required: true)
-  final double offer;
+  @JsonKey(name: "amount_off")
+  final double amountOff;
+  @JsonKey(name: "percentage_off")
+  final double percentageOff;
   @JsonKey(required: true)
   final String desc;
-  // currency is only required if discountType is voucher
-  String currency;
+  // currencyCode is only required if discountType is amount_off
+  String currencyCode;
   final String discountText;
-  @JsonKey(required: true, name: "expiring_date")
+  @JsonKey(required: true, name: "expiring_at")
   final int expiringTimeStamp;
   @JsonKey(ignore: true)
   final String _expiringDate;
@@ -68,26 +70,34 @@ class Coupon {
     this.couponId,
     this.isTextCoupon,
     this.qrCodeUrl,
+    this.amountOff,
+    this.percentageOff,
     @required this.desc,
     @required this.expiringTimeStamp,
     @required this.store,
     @required this.discountType,
-    @required this.offer,
-    @required this.textCouponCode,
+    this.textCouponCode,
     this.categories,
     this.textCouponUrl,
     this.state,
-    this.currency,
+    this.currencyCode,
   })  : _expiringDate = expiringDateFromStamp(expiringTimeStamp),
         discountText = _discountText(
           discountType,
-          currency: currency,
-          offer: offer,
+          currencyCode: currencyCode,
+          amountOff: amountOff,
+          percentageOff: percentageOff,
         );
 
   String get expiringDate => _expiringDate;
 
-  factory Coupon.fromJson(Map<String, dynamic> json) => _$CouponFromJson(json);
+  factory Coupon.fromJson(Map<String, dynamic> json) {
+    var coupon = _$CouponFromJson(json);
+    if (coupon.amountOff == null && coupon.percentageOff == null) {
+      throw 'amount_off or percentage_off must be specified';
+    }
+    return coupon;
+  }
   Map<String, dynamic> toJson() => _$CouponToJson(this);
 
   static String expiringDateFromStamp(int expiringDate) {
@@ -97,23 +107,25 @@ class Coupon {
   }
 
   static String _discountText(DiscountType type,
-      {@required double offer, @required String currency}) {
+      {@required double amountOff,
+      double percentageOff,
+      @required String currencyCode}) {
     String text;
-    if (type == DiscountType.percentage) {
-      text = "-$offer%";
+    if (type == DiscountType.percentageOff) {
+      text = "-$percentageOff%";
       return text;
     }
-    if (currency == null) {
+    if (currencyCode == null) {
       text = "invalid coupon";
       return text;
     }
     try {
       final formatCurrency = new NumberFormat.simpleCurrency(
-          locale: Platform.localeName, name: currency.toUpperCase());
-      var number = formatCurrency.format(offer);
+          locale: Platform.localeName, name: currencyCode.toUpperCase());
+      var number = formatCurrency.format(amountOff);
       return "- $number";
     } catch (e) {
-      return "-$currency $offer";
+      return "-$currencyCode $amountOff";
     }
   }
 }

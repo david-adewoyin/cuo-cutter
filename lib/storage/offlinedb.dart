@@ -1,23 +1,26 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/models/store.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/models/store.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 final String _tableSavedCoupons = "saved_coupons";
 final String _tableFollowedStores = "followed_stores";
+final String _tableTopCouponCategories = "top_categories";
+final String _tableCouponCategories = "coupons_categories";
 
-final String _tableCouponCategories = "search_categories";
 final String _columnCategoryName = "category";
 
 final String _columnCouponId = "coupon_id";
+final String _columnAmountOff = "amount_off";
+final String _columnPercentageOff = "percentage_off";
 final String _columnId = "id";
 final String _columnDesc = 'desc';
 final String _columnStoreName = 'store_name';
 final String _columnExp = 'exp';
 final String _columnImage = 'qrcode';
 final String _columnDiscountType = 'discount_type';
-final String _columnCurrency = 'currency';
+final String _columnCurrencyCode = 'currency_code';
 final String _columnStoreId = 'store_id';
 final String _columnStoreThemeColor = 'store_theme_color';
 final String _columnOffer = "offer";
@@ -29,10 +32,10 @@ final String _columnTextCouponUrl = "text_coupon_url";
 DiscountType _discountTypeFromString(String value) {
   switch (value) {
     case "voucher":
-      return DiscountType.voucher;
+      return DiscountType.amount_off;
       break;
     case "percentage":
-      return DiscountType.percentage;
+      return DiscountType.percentageOff;
       break;
     default:
       return null;
@@ -41,10 +44,10 @@ DiscountType _discountTypeFromString(String value) {
 
 String _discountTypeToString(DiscountType value) {
   switch (value) {
-    case DiscountType.percentage:
+    case DiscountType.percentageOff:
       return "percentage";
       break;
-    case DiscountType.voucher:
+    case DiscountType.amount_off:
       return "voucher";
       break;
     default:
@@ -101,8 +104,9 @@ class _SavedCoupon {
       _columnDesc: this.coupon.desc,
       _columnExp: this.coupon.expiringTimeStamp,
       _columnImage: this.coupon.qrCodeUrl,
-      _columnOffer: this.coupon.offer,
-      _columnCurrency: coupon.currency,
+      _columnAmountOff: this.coupon.amountOff,
+      _columnPercentageOff: this.coupon.percentageOff,
+      _columnCurrencyCode: coupon.currencyCode,
       _columnTextCouponCode: this.coupon.textCouponCode,
       _columnTextCouponUrl: this.coupon.textCouponUrl,
       _columnIsTextCoupon: this.coupon.isTextCoupon == true ? 1 : 0,
@@ -127,11 +131,12 @@ class _SavedCoupon {
       ),
       expiringTimeStamp: map[_columnExp],
       discountType: _discountTypeFromString(map[_columnDiscountType]),
-      offer: map[_columnOffer],
+      amountOff: map[_columnAmountOff],
+      percentageOff: map[_columnPercentageOff],
       isTextCoupon: map[_columnIsTextCoupon] == 1,
       textCouponCode: map[_columnTextCouponCode],
       textCouponUrl: map[_columnTextCouponUrl],
-      currency: map[_columnCurrency],
+      currencyCode: map[_columnCurrencyCode],
       qrCodeUrl: map[_columnImage],
     );
   }
@@ -157,10 +162,14 @@ class OfflineDbProvider {
           $_columnFollowing integer not null,
         $_columnStoreName text not null);
         ''');
-      await db.execute(''' create table $_tableCouponCategories(
+      await db.execute(''' create table $_tableTopCouponCategories(
 $_columnId integer primary key autoincrement,
-$_columnCategoryName text not null
+$_columnCategoryName text unique not null
       ); ''');
+      await db.execute(''' create table $_tableCouponCategories(
+        $_columnId integer primary key autoincrement,
+        $_columnCategoryName text unique not null
+        ''');
       await db.execute(''' create table $_tableSavedCoupons(
         $_columnId integer primary key autoincrement,
           $_columnCouponId text unique not null,
@@ -176,9 +185,22 @@ $_columnCategoryName text not null
           $_columnTextCouponCode text,
           $_columnTextCouponUrl text,
           $_columnImage text ,
-          $_columnCurrency text);
+          $_columnPercentageOff Real,
+          $_columnAmountOff Real,
+          $_columnCurrencyCode text);
           ''');
     });
+  }
+
+  Future<List<String>> getTopCategories() async {
+    List<Map> maps = await db
+        .query(_tableTopCouponCategories, columns: [_columnCategoryName]);
+    List<String> sc = [];
+    for (var map in maps) {
+      var c = _Category.fromMap(map);
+      sc.add(c.categoryName);
+    }
+    return sc;
   }
 
   Future<List<String>> getAllCategories() async {
@@ -190,6 +212,16 @@ $_columnCategoryName text not null
       sc.add(c.categoryName);
     }
     return sc;
+  }
+
+  Future<void> insertAllTopCategories(List<String> categories) async {
+    Batch batch = db.batch();
+    batch.delete(_tableTopCouponCategories);
+    for (var cat in categories) {
+      batch.insert(_tableCouponCategories, _Category(cat).toMap());
+    }
+    batch.commit(noResult: true, continueOnError: true);
+    return;
   }
 
   Future<void> insertAllCategories(List<String> categories) async {
@@ -282,8 +314,9 @@ $_columnCategoryName text not null
           _columnExp,
           _columnImage,
           _columnStoreId,
-          _columnCurrency,
-          _columnOffer,
+          _columnCurrencyCode,
+          _columnAmountOff,
+          _columnPercentageOff,
           _columnStoreThemeColor,
           _columnStoreName
         ],

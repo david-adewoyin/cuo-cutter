@@ -1,6 +1,6 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/models/store.dart';
-import 'package:cuo_cutter_app/models/user_store.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/models/store.dart';
+import 'package:cuo_cutter/models/user_store.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 

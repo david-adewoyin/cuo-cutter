@@ -1,5 +1,5 @@
-import 'package:cuo_cutter_app/models/store.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
+import 'package:cuo_cutter/models/store.dart';
+import 'package:cuo_cutter/storage/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 

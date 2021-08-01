@@ -1,4 +1,4 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
+import 'package:cuo_cutter/models/coupon.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -54,7 +54,10 @@ class CouponPayload {
   includeIfNull: false,
 )
 class CreateCouponPayload {
-  final int offer;
+  @JsonKey(name: "amount_off")
+  final double amountOff;
+  @JsonKey(name: "percentage_off")
+  final double percentageOff;
   final String desc;
   final List<String> categories;
   final String currency;
@@ -64,10 +67,13 @@ class CreateCouponPayload {
   final bool unlimitedRedemption;
   final int redemptionLimit;
   final bool isTextCoupon;
+  final String webUrl;
   final action;
 
   CreateCouponPayload({
-    @required this.offer,
+    this.amountOff,
+    this.percentageOff,
+    this.webUrl,
     @required this.desc,
     @required this.categories,
     @required this.currency,
@@ -100,7 +106,7 @@ class EmployeePayload {
   final String email;
   final EmployeePayloadAction action;
 
-  EmployeePayload(this.empId, this.email, {this.action});
+  EmployeePayload({this.empId, this.email, this.action});
   Map<String, dynamic> toJson() => _$EmployeePayloadToJson(this);
 }
 

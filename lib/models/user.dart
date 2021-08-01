@@ -1,4 +1,4 @@
-import 'package:cuo_cutter_app/storage/storage.dart';
+import 'package:cuo_cutter/storage/storage.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user.g.dart';

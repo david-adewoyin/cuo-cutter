@@ -1,6 +1,6 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -21,25 +21,6 @@ class ListingCouponAction extends StatelessWidget {
           offset.dx - 150, offset.dy + 15, 15000000000, 0),
       context: context,
       items: [
-        PopupMenuItem(
-          value: ListingCouponActions.share,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.share,
-                size: 18,
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Text(
-                "share",
-                style: body1,
-              ),
-            ],
-          ),
-        ),
         PopupMenuItem(
           value: ListingCouponActions.saveToGallery,
           child: Row(
@@ -111,9 +92,6 @@ class ListingCouponAction extends StatelessWidget {
             }
             break;
           case ListingCouponActions.saveToGallery:
-            Storage.instance.couponAction(coupon, value);
-            break;
-          case ListingCouponActions.share:
             Storage.instance.couponAction(coupon, value);
             break;
         }

@@ -1,6 +1,6 @@
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 
 class StoreCouponAction extends StatefulWidget {
@@ -26,24 +26,6 @@ class _StoreCouponActionState extends State<StoreCouponAction> {
       position: RelativeRect.fromLTRB(offset.dx, offset.dy - 10, 0, 0),
       context: context,
       items: [
-        PopupMenuItem(
-          value: StoreCouponActions.share,
-          child: Row(
-            children: [
-              Icon(
-                Icons.share,
-                size: 20,
-              ),
-              SizedBox(
-                width: 8,
-              ),
-              Text(
-                "share",
-                style: body1,
-              ),
-            ],
-          ),
-        ),
         PopupMenuItem(
           value: StoreCouponActions.saveToGallery,
           child: Row(
@@ -144,15 +126,6 @@ class _StoreCouponActionState extends State<StoreCouponAction> {
                 ),
               ));
             });
-
-            break;
-          case StoreCouponActions.share:
-            ScaffoldMessenger.maybeOf(context).showSnackBar(SnackBar(
-              content: Text(
-                "Unable to delete Coupon",
-                style: body2,
-              ),
-            ));
 
             break;
           case StoreCouponActions.saveToGallery:

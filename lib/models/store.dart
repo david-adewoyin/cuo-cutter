@@ -1,8 +1,8 @@
 // every user is associated with a store
 import 'dart:math';
 
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'store.g.dart';

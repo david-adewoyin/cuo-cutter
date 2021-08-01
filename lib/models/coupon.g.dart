@@ -10,29 +10,29 @@ Coupon _$CouponFromJson(Map<String, dynamic> json) {
   $checkKeys(json, requiredKeys: const [
     'coupon_id',
     'store',
-    'offer',
     'desc',
-    'expiring_date',
+    'expiring_at',
     'discount_type'
   ]);
   return Coupon(
     couponId: json['coupon_id'] as String,
     isTextCoupon: json['is_text_coupon'] as bool ?? false,
     qrCodeUrl: json['qr_code_url'] as String,
+    amountOff: (json['amount_off'] as num)?.toDouble(),
+    percentageOff: (json['percentage_off'] as num)?.toDouble(),
     desc: json['desc'] as String,
-    expiringTimeStamp: json['expiring_date'] as int,
+    expiringTimeStamp: json['expiring_at'] as int,
     store: json['store'] == null
         ? null
         : Store.fromJson(json['store'] as Map<String, dynamic>),
     discountType:
         _$enumDecodeNullable(_$DiscountTypeEnumMap, json['discount_type']),
-    offer: (json['offer'] as num)?.toDouble(),
     textCouponCode: json['text_coupon_code'] as String,
     categories: (json['categories'] as List)?.map((e) => e as String)?.toList(),
     textCouponUrl: json['text_coupon_url'] as String,
     state: _$enumDecodeNullable(_$CouponStateEnumMap, json['state']) ??
         CouponState.active,
-    currency: json['currency'] as String,
+    currencyCode: json['currency_code'] as String,
   );
 }
 
@@ -47,10 +47,11 @@ Map<String, dynamic> _$CouponToJson(Coupon instance) {
 
   writeNotNull('coupon_id', instance.couponId);
   writeNotNull('store', instance.store?.toJson());
-  writeNotNull('offer', instance.offer);
+  writeNotNull('amount_off', instance.amountOff);
+  writeNotNull('percentage_off', instance.percentageOff);
   writeNotNull('desc', instance.desc);
-  writeNotNull('currency', instance.currency);
-  writeNotNull('expiring_date', instance.expiringTimeStamp);
+  writeNotNull('currency_code', instance.currencyCode);
+  writeNotNull('expiring_at', instance.expiringTimeStamp);
   writeNotNull('discount_type', _$DiscountTypeEnumMap[instance.discountType]);
   writeNotNull('categories', instance.categories);
   writeNotNull('is_text_coupon', instance.isTextCoupon);
@@ -94,8 +95,8 @@ T _$enumDecodeNullable<T>(
 }
 
 const _$DiscountTypeEnumMap = {
-  DiscountType.voucher: 'voucher',
-  DiscountType.percentage: 'percentage',
+  DiscountType.amount_off: 'amount_off',
+  DiscountType.percentageOff: 'percentageOff',
 };
 
 const _$CouponStateEnumMap = {

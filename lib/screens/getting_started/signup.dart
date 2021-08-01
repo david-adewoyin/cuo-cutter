@@ -1,5 +1,5 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:validators/validators.dart';

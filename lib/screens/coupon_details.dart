@@ -1,8 +1,8 @@
-import 'package:cuo_cutter_app/components/listing_coupon_action.dart';
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
-import 'package:cuo_cutter_app/components/saved_coupon_action.dart';
+import 'package:cuo_cutter/components/listing_coupon_action.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
+import 'package:cuo_cutter/components/saved_coupon_action.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:clipboard/clipboard.dart';
@@ -19,7 +19,7 @@ class CouponDetails extends StatefulWidget {
 class _CouponDetailsState extends State<CouponDetails> {
   Coupon coupon;
   bool snackbarOpened = false;
-  bool _ifImageLoadSuccess = true;
+  bool _imageLoadSuccess = true;
   Future<Coupon> _couponFuture;
   @override
   void initState() {
@@ -54,6 +54,7 @@ class _CouponDetailsState extends State<CouponDetails> {
                 // check if snackbar is already opened
                 if (!snackbarOpened) {
                   snackbarOpened = true;
+                  Navigator.of(context).pop();
                   ScaffoldMessenger.maybeOf(context)
                       .showSnackBar(
                           SnackBar(content: Text("Unable to display coupon")))
@@ -108,14 +109,15 @@ class _CouponDetailsState extends State<CouponDetails> {
                   );
                 }
                 coupon = snapshot.data;
-                if (coupon.qrCodeUrl == null && coupon.textCouponCode == null) {
+                //TODO
+                /*      if (coupon.qrCodeUrl == null && coupon.textCouponCode == null) {
                   Navigator.maybeOf(context).pop();
                   if (!snackbarOpened) {
                     snackbarOpened = true;
                     ScaffoldMessenger.maybeOf(context).showSnackBar(
                         SnackBar(content: Text("Invalid Coupon")));
                   }
-                }
+                } */
                 return SingleChildScrollView(
                   child: Column(
                     children: [
@@ -213,6 +215,26 @@ class _CouponDetailsState extends State<CouponDetails> {
                       SizedBox(
                         height: 40,
                       ),
+                      Stack(
+                        children: [
+                          //TODO
+                          Container(
+                            alignment: Alignment.center,
+                            child: Icon(
+                              Icons.qr_code,
+                              size: 192,
+                            ),
+                          ),
+
+                          Container(
+                            alignment: Alignment(0.7, 0),
+                            child: ListingCouponAction(
+                              coupon: coupon,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
                       if (coupon.qrCodeUrl != null)
                         Stack(
                           children: [
@@ -221,6 +243,9 @@ class _CouponDetailsState extends State<CouponDetails> {
                               child: Material(
                                 child: InkWell(
                                   onTap: () {
+                                    if (!_imageLoadSuccess) {
+                                      return;
+                                    }
                                     Scaffold.maybeOf(context)
                                         .showBottomSheet((context) {
                                       return SizedBox.expand(
@@ -246,6 +271,8 @@ class _CouponDetailsState extends State<CouponDetails> {
                                                   height: 300,
                                                   imageErrorBuilder:
                                                       (context, _, __) {
+                                                    //    _qrCodeLoaded
+                                                    print(coupon.qrCodeUrl);
                                                     print(coupon.qrCodeUrl);
                                                     return Padding(
                                                       padding:
@@ -296,8 +323,7 @@ class _CouponDetailsState extends State<CouponDetails> {
                                     image: coupon.qrCodeUrl,
                                     height: 200,
                                     imageErrorBuilder: (context, _, __) {
-                                      _ifImageLoadSuccess = false;
-                                      print(coupon.qrCodeUrl);
+                                      _imageLoadSuccess = false;
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Center(
@@ -312,14 +338,13 @@ class _CouponDetailsState extends State<CouponDetails> {
                                 ),
                               ),
                             ),
-                            if (_ifImageLoadSuccess)
-                              Container(
-                                alignment: Alignment(0.7, 0),
-                                child: ListingCouponAction(
-                                  coupon: coupon,
-                                  color: primaryColor,
-                                ),
+                            Container(
+                              alignment: Alignment(0.7, 0),
+                              child: ListingCouponAction(
+                                coupon: coupon,
+                                color: primaryColor,
                               ),
+                            ),
                           ],
                         ),
                       Center(

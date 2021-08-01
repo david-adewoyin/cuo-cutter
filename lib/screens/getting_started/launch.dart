@@ -1,7 +1,7 @@
-import 'package:cuo_cutter_app/screens/getting_started/onboarding.dart';
-import 'package:cuo_cutter_app/screens/home.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/getting_started/onboarding.dart';
+import 'package:cuo_cutter/screens/home.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 
 //Default lauchpage for the app

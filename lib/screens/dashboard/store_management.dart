@@ -1,7 +1,7 @@
-import 'package:cuo_cutter_app/models/store.dart';
-import 'package:cuo_cutter_app/models/user_store.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/models/store.dart';
+import 'package:cuo_cutter/models/user_store.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:validators/validators.dart';
@@ -128,8 +128,11 @@ class _StoreManagementState extends State<StoreManagementPage> {
 
   Widget buildEmployee(Employee employee) {
     return ListTile(
-      title: Text(employee.fullName),
-      subtitle: Text("${employee.state.toString()}"),
+      title: Text(
+        employee.fullName,
+        style: body1,
+      ),
+      subtitle: Text("ff ${employee.state}"),
     );
   }
 
@@ -333,125 +336,6 @@ class _StoreManagementState extends State<StoreManagementPage> {
                   SizedBox(
                     height: 50,
                   ),
-                  /*  ExpansionTile(
-                    tilePadding: EdgeInsets.all(0),
-                    children: _subStoresWidgets,
-                    subtitle: Container(
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text(
-                        "Substores enables you to create a store hierrachy. Substores can add it own employees and substores which can validate coupons",
-                        style: body2.copyWith(
-                          color: Colors.white.withAlpha(220),
-                        ),
-                      ),
-                    ),
-                    title: Row(
-                      children: [
-                        Text(
-                          "Substores",
-                          style: h5,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.add),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  backgroundColor: backgroundVariant1Color,
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        var email =
-                                            _emailController.text.trim();
-                                        bool valid = _emailIsValid(email);
-
-                                        if (!valid) {
-                                          return;
-                                        }
-
-                                        _emailController.clear();
-                                        addSubStore(email);
-                                        Navigator.maybeOf(context).pop();
-                                      },
-                                      child: Text(
-                                        "Submit",
-                                        style:
-                                            body1.copyWith(color: primaryColor),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.maybeOf(context).pop();
-                                      },
-                                      child: Text(
-                                        "Cancel",
-                                        style: body1.copyWith(
-                                          color: Colors.white70,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                  content: TextFormField(
-                                    controller: _emailController,
-                                    autovalidateMode:
-                                        AutovalidateMode.onUserInteraction,
-                                    validator: _emailValidator,
-                                    keyboardType: TextInputType.emailAddress,
-                                    textInputAction: TextInputAction.done,
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      // fillColor: Colors.grey[900],
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      counterText: "",
-                                      prefixIcon: Icon(
-                                        Icons.email,
-                                        size: 18,
-                                      ),
-                                      labelText: "Email",
-
-                                      hintText: 'Enter substore email address',
-                                    ),
-                                  ),
-                                  title: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(height: 20),
-                                      Text(
-                                        "Enter Substore email address",
-                                        style: body1,
-                                      ),
-                                      SizedBox(
-                                        height: 20,
-                                      ),
-                                      Text(
-                                        "An email will be sent to this address to be accepted in other to be added as a substore",
-                                        style: body1.copyWith(
-                                            fontSize: 15.5,
-                                            fontWeight: FontWeight.w300),
-                                      ),
-                                      SizedBox(
-                                        height: 10,
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 30,
-                  ), */
                   ExpansionTile(
                     tilePadding: EdgeInsets.all(0),
                     subtitle: Padding(

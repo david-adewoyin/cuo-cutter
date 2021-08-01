@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:cuo_cutter_app/screens/category_details.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/category_details.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {

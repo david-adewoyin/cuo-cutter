@@ -98,8 +98,8 @@ T _$enumDecodeNullable<T>(
 }
 
 const _$DiscountTypeEnumMap = {
-  DiscountType.voucher: 'voucher',
-  DiscountType.percentage: 'percentage',
+  DiscountType.amount_off: 'amount_off',
+  DiscountType.percentageOff: 'percentageOff',
 };
 
 const _$CouponPayloadActionEnumMap = {
@@ -109,7 +109,9 @@ const _$CouponPayloadActionEnumMap = {
 
 CreateCouponPayload _$CreateCouponPayloadFromJson(Map<String, dynamic> json) {
   return CreateCouponPayload(
-    offer: json['offer'] as int,
+    amountOff: (json['amount_off'] as num)?.toDouble(),
+    percentageOff: (json['percentage_off'] as num)?.toDouble(),
+    webUrl: json['web_url'] as String,
     desc: json['desc'] as String,
     categories: (json['categories'] as List)?.map((e) => e as String)?.toList(),
     currency: json['currency'] as String,
@@ -132,7 +134,8 @@ Map<String, dynamic> _$CreateCouponPayloadToJson(CreateCouponPayload instance) {
     }
   }
 
-  writeNotNull('offer', instance.offer);
+  writeNotNull('amount_off', instance.amountOff);
+  writeNotNull('percentage_off', instance.percentageOff);
   writeNotNull('desc', instance.desc);
   writeNotNull('categories', instance.categories);
   writeNotNull('currency', instance.currency);
@@ -141,14 +144,15 @@ Map<String, dynamic> _$CreateCouponPayloadToJson(CreateCouponPayload instance) {
   writeNotNull('unlimited_redemption', instance.unlimitedRedemption);
   writeNotNull('redemption_limit', instance.redemptionLimit);
   writeNotNull('is_text_coupon', instance.isTextCoupon);
+  writeNotNull('web_url', instance.webUrl);
   writeNotNull('action', instance.action);
   return val;
 }
 
 EmployeePayload _$EmployeePayloadFromJson(Map<String, dynamic> json) {
   return EmployeePayload(
-    json['emp_id'] as String,
-    json['email'] as String,
+    empId: json['emp_id'] as String,
+    email: json['email'] as String,
     action:
         _$enumDecodeNullable(_$EmployeePayloadActionEnumMap, json['action']),
   );

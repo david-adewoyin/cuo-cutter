@@ -1,0 +1,68 @@
+name: cuo_cutter
+description: A new Flutter project.
+
+
+publish_to: 'none' # Remove this line if you 
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.0.1
+  validators: ^2.0.0
+  google_fonts: ^1.1.1
+  camera: ^0.8.0
+
+  firebase_core: ^1.0.0-1.0.nullsafety.0
+ 
+  flutter_typeahead: ^2.0.0
+  
+  firebase_ml_vision: ^0.11.0
+  dio: ^3.0.10
+  dio_http2_adapter: ^1.0.1
+  intl: ^0.17.0
+  currency_picker: ^2.0.3
+  font_awesome_flutter: ^8.11.0
+  connectivity: ^3.0.2
+  share: ^2.0.0
+  json_annotation: ^3.0.0
+  image_picker: ^0.6.7+21
+  flutter_native_splash: ^1.0.3
+  flutter_secure_storage: ^4.1.0
+  shared_preferences: ^2.0.3
+  flutter_svg: ^0.21.0-nullsafety.0
+  clipboard: ^0.1.3
+  cupertino_icons: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^1.0.0
+  json_serializable: ^3.0.2
+  url_launcher: ^6.0.2
+
+  transparent_image: any
+  fluttertoast: ^7.1.8
+  sqflite: ^2.0.0+2
+
+
+# The following section is specific to Flutter.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+ 
+        
+
+  assets:
+    - assets/images/
+    - google_fonts/
+  
+  

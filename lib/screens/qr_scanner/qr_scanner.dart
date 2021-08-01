@@ -1,16 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cuo_cutter_app/main.dart';
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/screens/qr_scanner/util.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/main.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/screens/qr_scanner/util.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -97,12 +96,12 @@ class _CameraAppState extends State<CameraApp>
   initCamera() {
     controller = CameraController(
       camera,
-      ResolutionPreset.low,
+      ResolutionPreset.medium,
       enableAudio: false,
     );
     _initCamera = controller.initialize();
     _initCamera.then((_) async {
-      controller.setZoomLevel(2);
+      controller.setZoomLevel(2.5);
       streamImages();
     });
   }

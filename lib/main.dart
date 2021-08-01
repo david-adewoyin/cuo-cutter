@@ -1,6 +1,6 @@
 import 'package:camera/camera.dart';
-import 'package:cuo_cutter_app/screens/getting_started/launch.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/screens/getting_started/launch.dart';
+import 'package:cuo_cutter/theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1098320411320",
+    "project_id": "coupon-cutter",
+    "storage_bucket": "coupon-cutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098320411320:android:279404f747f45dfe43524d",
+        "android_client_info": {
+          "package_name": "com.example.cuo_cutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1098320411320-b3uqs5n0uqc23pf7sef1pu0ifcgfqobo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCkSJykX3Iikb_sbINfDT8y3u3cmrPQMws"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1098320411320-b3uqs5n0uqc23pf7sef1pu0ifcgfqobo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

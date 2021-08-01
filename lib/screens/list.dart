@@ -1,9 +1,9 @@
 import 'package:connectivity/connectivity.dart';
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/storage/storage.dart';
-import 'package:cuo_cutter_app/theme.dart';
-import 'package:cuo_cutter_app/components/popular_coupon.dart';
-import 'package:cuo_cutter_app/components/single_coupon.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/storage/storage.dart';
+import 'package:cuo_cutter/theme.dart';
+import 'package:cuo_cutter/components/popular_coupon.dart';
+import 'package:cuo_cutter/components/single_coupon.dart';
 import 'package:flutter/material.dart';
 
 class FilterCoupons extends StatefulWidget {

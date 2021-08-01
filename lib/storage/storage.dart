@@ -1,20 +1,21 @@
 import 'dart:convert';
 import 'package:connectivity/connectivity.dart';
-import 'package:cuo_cutter_app/models/coupon.dart';
-import 'package:cuo_cutter_app/models/store.dart';
-import 'package:cuo_cutter_app/models/user_store.dart';
-import 'package:cuo_cutter_app/storage/offlinedb.dart';
-import 'package:cuo_cutter_app/storage/request.dart';
-import 'package:cuo_cutter_app/storage/response.dart';
-import 'package:cuo_cutter_app/theme.dart';
+import 'package:cuo_cutter/models/coupon.dart';
+import 'package:cuo_cutter/models/store.dart';
+import 'package:cuo_cutter/models/user_store.dart';
+import 'package:cuo_cutter/storage/offlinedb.dart';
+import 'package:cuo_cutter/storage/request.dart';
+import 'package:cuo_cutter/storage/response.dart';
+import 'package:cuo_cutter/storage/testdata.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-final BASE_URL = "https://8dbf91f06685.ngrok.io/";
+//Base_Url is the url that the app connects to
+const BASE_URL = "";
 
 final base = BaseOptions(
   responseType: ResponseType.plain,
@@ -37,7 +38,7 @@ class _CouponKeySet {
 enum StoreCouponActions {
   delete,
   saveToGallery,
-  share,
+//  share,
 }
 enum SaveCouponActions {
   remove,
@@ -45,7 +46,7 @@ enum SaveCouponActions {
 }
 enum ListingCouponActions {
   saveToGallery,
-  share,
+//  share,
   addToFavourite,
 }
 
@@ -96,6 +97,26 @@ class Storage {
     }
   }
 
+  _setDefaultCurrency(String currency) {
+    _prefs.setString("default_currency_code", currency);
+  }
+
+  String getDefaultCurrency() {
+    try {
+      var value = _prefs.getString("default_currency_code");
+      if (value == null) {
+        var format = NumberFormat.simpleCurrency();
+        value = format.currencyName;
+        return value;
+      }
+      return value;
+    } catch (e) {
+      var format = NumberFormat.simpleCurrency();
+      var currencyCode = format.currencyName;
+      return currencyCode;
+    }
+  }
+
   setFreshAppInstall() {
     _prefs.setBool("freshinstall", false);
   }
@@ -138,6 +159,8 @@ class Storage {
   // send a login request to the server
   Future<bool> loginUser(
       {@required String email, @required String password}) async {
+    // for debug returns true
+    return true;
     try {
       var client = Dio(BaseOptions(
           responseType: ResponseType.plain,
@@ -183,11 +206,40 @@ class Storage {
     return [list[0], list[1]];
   }
 
-  Future<List<String>> fetchTopCategories() async {
+  Future<List<String>> getCouponsCategories() async {
+    try {
+      var cats = await _offlineDbProvider.getAllCategories();
+      return cats;
+    } catch (e) {}
+    // returns test data for testing
+    return testCategories;
+
     var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
         baseUrl: BASE_URL,
         contentType: Headers.formUrlEncodedContentType));
+    var res =
+        await client.get("/coupon/categories", queryParameters: {"limit": 100});
+    if (res.statusCode == 200) {
+      try {
+        var json = jsonDecode(res.data);
+        var c = CategoriesResponse.fromJson(json);
+        _offlineDbProvider.insertAllCategories(c.categories);
+        return c.categories;
+      } catch (e) {}
+    }
+    return [];
+  }
+
+  Future<List<String>> fetchTopCategories() async {
+    var client = Dio(
+      BaseOptions(
+          responseType: ResponseType.plain,
+          baseUrl: BASE_URL,
+          contentType: Headers.formUrlEncodedContentType),
+    );
+    // returns test data for testing
+    return testCategories;
     var res = await client
         .get("/coupon/categories", queryParameters: {"limit": 10, "top": true});
     if (res.statusCode == 200) {
@@ -201,6 +253,9 @@ class Storage {
   }
 
   Future<List<String>> fetchSearchCategories() async {
+    // returns test data for testing
+    return testCategories;
+
     if (_searchCategories.isNotEmpty) {
       return Future.value(_searchCategories);
     }
@@ -208,7 +263,7 @@ class Storage {
     if ((now.millisecondsSinceEpoch - lastOnlineTime()) <
         Duration(days: 1).inMilliseconds) {
       try {
-        var cat = await _offlineDbProvider.getAllCategories();
+        var cat = await _offlineDbProvider.getTopCategories();
         if (cat.isNotEmpty) {
           return cat;
         }
@@ -225,7 +280,7 @@ class Storage {
       try {
         var json = jsonDecode(res.data);
         var c = CategoriesResponse.fromJson(json);
-        _offlineDbProvider.insertAllCategories(c.categories);
+        _offlineDbProvider.insertAllTopCategories(c.categories);
         return c.categories;
       } catch (e) {
         Future.error("unable to fetch content");
@@ -236,6 +291,9 @@ class Storage {
 
   // returns a list of the latest coupons with the filter applied
   Future<List<Coupon>> filterLatestList(String filter) async {
+    // returns test data for testing
+    return testCoupons;
+
     var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
         baseUrl: BASE_URL,
@@ -262,6 +320,8 @@ class Storage {
 
 // returns a list of the popular coupons with the filter applied
   Future<List<Coupon>> filterPopularList(String filter) async {
+    // returns test data for testing
+    return testCoupons;
     var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
         baseUrl: BASE_URL,
@@ -282,6 +342,8 @@ class Storage {
 
 // returns a list of popular coupons
   Future<List<Coupon>> fetchPopularCoupons() async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -306,6 +368,8 @@ class Storage {
 
   // returns a list of the latest coupons
   Future<List<Coupon>> fetchLatestCoupons() async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -342,6 +406,8 @@ class Storage {
 
   Future<List<Coupon>> fetchLatestCouponsBeforeIDAndTimeFiltered(
       {@required String filter}) async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -390,6 +456,8 @@ class Storage {
   }
 
   Future<Coupon> fetchSingleCoupon(String couponId) async {
+    // returns test data for testing
+    return testCoupons[0];
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -413,6 +481,8 @@ class Storage {
   }
 
   Future<Store> fetchStoreDetails({@required String storeid}) async {
+    // returns test data for testing
+    return testStores[0];
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -439,6 +509,8 @@ class Storage {
   }
 
   Future<List<Coupon>> fetchStoreCoupons({@required String storeid}) async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -469,6 +541,8 @@ class Storage {
 
   Future<List<Coupon>> fetchStoreCouponsBeforeIDAndTime(
       {@required String storeid}) async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -502,6 +576,8 @@ class Storage {
   }
 
   Future<Store> fetchUserStore() async {
+    // returns test data for testing
+    return testStores[0];
     String accessToken;
     try {
       accessToken = await _getToken();
@@ -536,6 +612,8 @@ class Storage {
 
   Future<List<Coupon>> fetchUserStoreCoupons({@required String filter}) async {
     String accessToken;
+    // returns test data for testing
+    return testCoupons;
     try {
       accessToken = await _getToken();
     } catch (e) {
@@ -579,6 +657,8 @@ class Storage {
   Future<int> fetchUserStoreCouponRedeemedCount(
       {@required String filter}) async {
     String accessToken;
+    // returns test data for testing
+    return 30;
     try {
       accessToken = await _getToken();
     } catch (e) {
@@ -612,6 +692,8 @@ class Storage {
   }
 
   Future<List<Coupon>> fetchCouponsSaved() async {
+    // returns test data for testing
+    return testCoupons;
     Connectivity connectivity = Connectivity();
     var internetAccess = await connectivity.checkConnectivity();
     switch (internetAccess) {
@@ -655,6 +737,8 @@ class Storage {
   }
 
   Future<List<Store>> fetchStoresFollowed() async {
+    // returns test data for testing
+    return testStores;
     Connectivity connectivity = Connectivity();
     var internetAccess = await connectivity.checkConnectivity();
     switch (internetAccess) {
@@ -699,7 +783,7 @@ class Storage {
     return Future.error("unable to fetch stores");
   }
 
-  Future<List<Store>> fetchSubStores() async {
+  /* Future<List<Store>> fetchSubStores() async {
     String accessToken;
     try {
       accessToken = await _getToken();
@@ -732,7 +816,7 @@ class Storage {
     }
     return Future.error("unable to fetch sub stores");
   }
-
+ */
   Future<List<Employee>> fetchEmployees() async {
     String accessToken;
     try {
@@ -800,6 +884,8 @@ class Storage {
   }
 
   Future<List<Coupon>> fetchCategoryCoupons({String categoryName}) async {
+    // returns test data for testing
+    return testCoupons;
     try {
       var client = Dio(BaseOptions(
         responseType: ResponseType.plain,
@@ -838,15 +924,16 @@ class Storage {
 
   Future<void> createStoreCoupon(
       {@required DiscountType discountType,
-      @required int offer,
       @required int expiringDate,
       @required List<String> categories,
       @required bool isTextCoupon,
       @required desc,
+      double amountOff,
+      double percentageOff,
       //  @required bool singleUserUse,
       @required bool unlimitedRedemption,
-      @required currency,
-      String itemUrl,
+      @required String currencyCode,
+      String webUrl,
       String textCouponCode,
       int redemptionLimit}) async {
     String accessToken;
@@ -865,12 +952,14 @@ class Storage {
       ));
 
       var payload = CreateCouponPayload(
-        offer: offer,
+        percentageOff: percentageOff,
+        amountOff: amountOff,
         desc: desc,
         categories: categories,
-        currency: currency,
+        currency: currencyCode,
         discountType: discountType,
         expiringDate: expiringDate,
+
         // singleUserUse: singleUserUse,
         unlimitedRedemption: unlimitedRedemption,
         redemptionLimit: redemptionLimit,
@@ -890,6 +979,7 @@ class Storage {
           return Future.error("unable to create coupon");
         }
       }
+      _setDefaultCurrency(currencyCode);
     } on DioError catch (e) {
       print(e.response.data);
       return Future.error("unable to create coupon");
@@ -992,9 +1082,7 @@ class Storage {
     switch (action) {
       case StoreCouponActions.delete:
         return deleteStoreCoupon(coupon.couponId);
-        break;
-      case StoreCouponActions.share:
-        //TODO
+
         break;
       case StoreCouponActions.saveToGallery:
         // TODO: Handle this case.
@@ -1057,9 +1145,6 @@ class Storage {
         break;
       case ListingCouponActions.saveToGallery:
         //TODO
-        break;
-      case ListingCouponActions.share:
-        // TODO: Handle this case.
         break;
     }
     return Future.error("unable to process request");
@@ -1135,11 +1220,151 @@ class Storage {
     return Future.error("unable to check coupon state");
   }
 
-  suspendEmployee({@required String empId}) async {}
-  resumeEmployee({@required String empId}) async {}
-  removeEmployee({@required String empId}) async {}
-  addEmployee({@required String email}) async {}
-  addSubStore(String email) async {}
-  removeSubStore(String id) async {}
-  getSubStores() async {}
+  suspendEmployee({@required String empId}) async {
+    String accessToken;
+    try {
+      accessToken = await _getToken();
+    } catch (e) {
+      return Future.error("unable to process request");
+    }
+    try {
+      var client = Dio(BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"authorization": "bearer $accessToken"},
+        contentType: "application/json",
+        baseUrl: BASE_URL,
+      ));
+
+      var payload =
+          EmployeePayload(empId: empId, action: EmployeePayloadAction.suspend);
+      var res =
+          await client.post("store/dashboard/employee", data: payload.toJson());
+      if (res.statusCode == 200) {
+        return;
+      }
+    } on DioError catch (e) {
+      if (e.response.statusCode > 500) {
+        return Future.error("unable to suspend employee");
+      }
+      if (e.response.statusCode == 404) {}
+      if (e.response.statusCode > 400 && e.response.statusCode < 500) {
+        var json = jsonDecode(e.response.data);
+        String message = json["message"];
+        return Future.error(message);
+      }
+    }
+    return Future.error("unable to suspend employee");
+  }
+
+  resumeEmployee({@required String empId}) async {
+    String accessToken;
+    try {
+      accessToken = await _getToken();
+    } catch (e) {
+      return Future.error("unable to process request");
+    }
+    try {
+      var client = Dio(BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"authorization": "bearer $accessToken"},
+        contentType: "application/json",
+        baseUrl: BASE_URL,
+      ));
+
+      var payload =
+          EmployeePayload(empId: empId, action: EmployeePayloadAction.resume);
+      var res =
+          await client.post("store/dashboard/employee", data: payload.toJson());
+      if (res.statusCode == 200) {
+        return;
+      }
+    } on DioError catch (e) {
+      if (e.response.statusCode > 500) {
+        return Future.error("unable to resume employee");
+      }
+      if (e.response.statusCode > 400 &&
+          e.response.statusCode != 400 &&
+          e.response.statusCode < 500) {
+        var json = jsonDecode(e.response.data);
+        String message = json["message"];
+        return Future.error(message);
+      }
+    }
+    return Future.error("unable to resume employee");
+  }
+
+  removeEmployee({@required String empId}) async {
+    String accessToken;
+    try {
+      accessToken = await _getToken();
+    } catch (e) {
+      return Future.error("unable to process request");
+    }
+    try {
+      var client = Dio(BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"authorization": "bearer $accessToken"},
+        contentType: "application/json",
+        baseUrl: BASE_URL,
+      ));
+
+      var payload =
+          EmployeePayload(empId: empId, action: EmployeePayloadAction.remove);
+      var res =
+          await client.post("store/dashboard/employee", data: payload.toJson());
+      if (res.statusCode == 200) {
+        return;
+      }
+    } on DioError catch (e) {
+      if (e.response.statusCode > 500) {
+        return Future.error("unable to remove employee");
+      }
+      if (e.response.statusCode == 404) {}
+      if (e.response.statusCode > 400 && e.response.statusCode < 500) {
+        var json = jsonDecode(e.response.data);
+        String message = json["message"];
+        return Future.error(message);
+      }
+    }
+    return Future.error("unable to remove employee");
+  }
+
+  addEmployee({@required String email}) async {
+    String accessToken;
+    try {
+      accessToken = await _getToken();
+    } catch (e) {
+      return Future.error("unable to process request");
+    }
+    try {
+      var client = Dio(BaseOptions(
+        responseType: ResponseType.plain,
+        headers: {"authorization": "bearer $accessToken"},
+        contentType: "application/json",
+        baseUrl: BASE_URL,
+      ));
+
+      var payload =
+          EmployeePayload(email: email, action: EmployeePayloadAction.create);
+      var res =
+          await client.post("store/dashboard/employee", data: payload.toJson());
+      if (res.statusCode == 200) {
+        return;
+      }
+    } on DioError catch (e) {
+      if (e.response.statusCode > 500) {
+        return Future.error("unable to create employee");
+      }
+      if (e.response.statusCode == 404) {}
+      if (e.response.statusCode > 400 && e.response.statusCode < 500) {
+        var json = jsonDecode(e.response.data);
+        String message = json["message"];
+        return Future.error(message);
+      }
+    }
+    return Future.error("unable to create employee");
+  }
+  //addSubStore(String email) async {}
+  //removeSubStore(String id) async {}
+  //getSubStores() async {}
 }
