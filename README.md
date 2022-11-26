@@ -16,7 +16,7 @@ A Flutter implementation of a mobile coupon system
 Download or clone this repo by using the link below (make sure you have flutter installed):
 
 ```
-git clone https://github.com/david-adewoyin/country_directory.git
+git clone https://github.com/david-adewoyin/cuo-cutter.git
 ```
 
 **Step 2:**
