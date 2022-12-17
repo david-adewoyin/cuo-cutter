@@ -7,7 +7,7 @@ A Flutter implementation of a mobile coupon system
 * Validation of coupons through the use of a qrcode
 
 
-[The mobile coupon is based upon this paper ](https://github.com/david-adewoyin/cuo-cutter/files/6913333/coupon.pdf)
+[The mobile coupon system took ideas from this paper on secured mobile coupon systems ](https://github.com/david-adewoyin/cuo-cutter/files/6913333/coupon.pdf)
 
 ## Installation
 
